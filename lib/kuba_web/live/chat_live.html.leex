@@ -1,0 +1,33 @@
+<div class="border-b border-blue-600">
+  <ul class="flex px-4 pt-2">
+    <li class="mr-1">
+      <a class="bg-blue-200 inline-block border-l border-r rounded-t py-2 px-4 text-blue-700 font-semibold" href="#">Lobby</a>
+    </li>
+    <li class="mr-1">
+      <a class="bg-white inline-block py-2 px-4 text-blue-500 hover:text-blue-800 font-semibold" href="#">Tab</a>
+    </li>
+    <li class="mr-1">
+      <a class="bg-white inline-block py-2 px-4 text-blue-500 hover:text-blue-800 font-semibold" href="#">Tab</a>
+    </li>
+  </ul>
+</div>
+<div class="flex flex-row flex-grow border-b border-blue-600">
+  <div class="flex-grow border-blue-600 p-4">
+    <%= for message <- @messages do %>
+      <p><%= Calendar.strftime(message.datetime, "%H:%M") %> <%= message.author %>: <%= message.body %></p>
+    <% end %>
+  </div>
+  <div class="w-1/6 border-l p-4 border-blue-600">
+    <%= for user <- @channel.users do %>
+      <p><%= user %></p>
+    <% end %>
+  </div>
+</div>
+<div class="bg-blue-200">
+  <%= f = form_for @chat, "#", [phx_change: :change, phx_submit: :save, as: :chat, class: "m-4 flex flex-row" ] %>
+  <!-- <form class="m-4 flex flex-row"> -->
+    <%= text_input f, :message, class: "flex-grow rounded border-blue-300 border p-1 mr-4 focus:shadow-outline focus:outline-none" %>
+    <!--<input type="text" name="message" class="flex-grow rounded border-blue-299 border p-1 mr-4 focus:shadow-outline focus:outline-none" autofocus placeholder="Say something" /> -->
+    <button class="focus:outline-none focus:shadow-outline focus:border-blue-300 rounded px-3 py-1 bg-blue-300">Send</button>
+  </form>
+</div>

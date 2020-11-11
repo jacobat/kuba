@@ -2,12 +2,12 @@ defmodule KubaWeb.ChatLive do
   use KubaWeb, :live_view
 
   @impl true
-  def mount(_params, _session, socket) do
-    nick = "User #{Enum.random(1..1000)}"
+  def mount(_params, session, socket) do
+    nick = session["nick"]
     KubaEngine.Channel.start_link("Lobby")
     Phoenix.PubSub.subscribe(Kuba.PubSub, "channel:Lobby")
 
-    IO.inspect _session
+    IO.inspect session
     if connected?(socket) do
       KubaEngine.Channel.join("Lobby", nick)
       {:ok, assign(socket, nick: nick, channel: channel, chat: changeset, messages: messages)}

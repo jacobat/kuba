@@ -29,7 +29,9 @@ defmodule KubaWeb.UserLive.FormComponent do
 
   defp save_user(socket, :edit, user_params) do
     case Accounts.update_user(socket.assigns.user, user_params) do
-      {:ok, _user} ->
+      {:ok, user} ->
+        Chat.put("Updated user #{user.name}")
+        Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "edit:#{user.id}")
         {:noreply,
          socket
          |> put_flash(:info, "User updated successfully")
@@ -42,7 +44,9 @@ defmodule KubaWeb.UserLive.FormComponent do
 
   defp save_user(socket, :new, user_params) do
     case Accounts.create_user(user_params) do
-      {:ok, _user} ->
+      {:ok, user} ->
+        Chat.put("Created user #{user.name}")
+        Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "edit:#{user.id}")
         {:noreply,
          socket
          |> put_flash(:info, "User created successfully")

@@ -6,6 +6,9 @@ defmodule KubaWeb.UserLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    Phoenix.PubSub.subscribe(Kuba.PubSub, "test")
+    IO.puts "Mounting socket for index live"
+    socket = assign(socket, :messages, Chat.messages)
     {:ok, assign(socket, :users, list_users())}
   end
 
@@ -15,12 +18,15 @@ defmodule KubaWeb.UserLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
+    result = socket
     |> assign(:page_title, "Edit User")
     |> assign(:user, Accounts.get_user!(id))
+    Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "edit:#{id}")
+    result
   end
 
   defp apply_action(socket, :new, _params) do
+    Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "new")
     socket
     |> assign(:page_title, "New User")
     |> assign(:user, %User{})
@@ -38,6 +44,12 @@ defmodule KubaWeb.UserLive.Index do
     {:ok, _} = Accounts.delete_user(user)
 
     {:noreply, assign(socket, :users, list_users())}
+  end
+
+  def handle_info(state, socket) do
+    messages = Chat.messages
+    IO.puts "HANDLE BROADCAST FOR [#{state}]: #{IO.inspect(messages)}"
+    {:noreply, assign(socket, :messages, messages)}
   end
 
   defp list_users do

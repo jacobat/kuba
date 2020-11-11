@@ -33,5 +33,9 @@
     <% end %>
   </tbody>
 </table>
-
+<pre>
+<%= for message <- @messages do %>
+  <%= message %>
+<% end %>
+</pre>
 <span><%= live_patch "New User", to: Routes.user_index_path(@socket, :new) %></span>

@@ -14,9 +14,10 @@ defmodule Kuba.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Kuba.PubSub},
       # Start the Endpoint (http/https)
-      KubaWeb.Endpoint
+      KubaWeb.Endpoint,
       # Start a worker by calling: Kuba.Worker.start_link(arg)
       # {Kuba.Worker, arg}
+      {Chat, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

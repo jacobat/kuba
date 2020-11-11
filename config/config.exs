@@ -18,6 +18,7 @@ config :kuba, KubaWeb.Endpoint,
   pubsub_server: Kuba.PubSub,
   live_view: [signing_salt: "FakMY5TJ"]
 
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

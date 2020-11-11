@@ -17,8 +17,9 @@ defmodule KubaWeb.Router do
   scope "/", KubaWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
-    
+    live "/", ChatLive, :index
+    live "/page", PageLive, :index
+
     live "/users", UserLive.Index, :index
     live "/users/new", UserLive.Index, :new
     live "/users/:id/edit", UserLive.Index, :edit

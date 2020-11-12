@@ -11,13 +11,13 @@
     </li>
   </ul>
 </div>
-<div class="flex flex-row flex-grow border-b border-blue-600">
+<div class="flex flex-row flex-grow border-b border-blue-600-h-full min-h-0">
   <div class="flex-grow border-blue-600 p-4">
     <%= for message <- @messages do %>
       <p><%= Calendar.strftime(message.datetime, "%H:%M") %> <%= message.author %>: <%= message.body %></p>
     <% end %>
   </div>
-  <div class="w-1/6 border-l p-4 border-blue-600">
+  <div class="w-1/6 border-l px-4 py-3 border-blue-600 overflow-y-auto">
     <%= for user <- @channel.users do %>
       <p><%= user %></p>
     <% end %>

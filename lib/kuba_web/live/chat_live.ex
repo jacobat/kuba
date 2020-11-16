@@ -4,12 +4,10 @@ defmodule KubaWeb.ChatLive do
   @impl true
   def mount(_params, session, socket) do
     nick = session["nick"]
-    KubaEngine.Channel.start_link("Lobby")
-    Phoenix.PubSub.subscribe(Kuba.PubSub, "channel:Lobby")
 
     IO.inspect session
     if connected?(socket) do
-      KubaEngine.Channel.join("Lobby", nick)
+      Kuba.Channels.join("Lobby", nick)
       {:ok, assign(socket, nick: nick, channel: channel, chat: changeset, messages: messages)}
     else
       {:ok, assign(socket, channel: channel, chat: changeset, messages: messages)}
@@ -18,8 +16,7 @@ defmodule KubaWeb.ChatLive do
 
   @impl true
   def handle_event("save", %{"chat" => %{"message" => message}}, socket) do
-    KubaEngine.Channel.speak("Lobby", KubaEngine.Message.new(message, socket.assigns.nick))
-    Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:Lobby", {:speak, message})
+    Kuba.Channels.speak("Lobby", socket.assigns.nick, message)
     {
       :noreply,
       assign(socket, :chat, changeset())
@@ -37,6 +34,11 @@ defmodule KubaWeb.ChatLive do
     {:noreply, new_socket}
   end
 
+  def handle_info({:join, nick}, socket) do
+    IO.puts "#{inspect self()} received join from #{nick}"
+    new_socket = assign(socket, channel: channel)
+    {:noreply, new_socket}
+  end
 
   defp channel do
     KubaEngine.Channel.channel_for("Lobby")

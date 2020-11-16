@@ -25,9 +25,7 @@
 </div>
 <div class="bg-blue-200">
   <%= f = form_for @chat, "#", [phx_change: :change, phx_submit: :save, as: :chat, class: "m-4 flex flex-row" ] %>
-  <!-- <form class="m-4 flex flex-row"> -->
     <%= text_input f, :message, class: "flex-grow rounded border-blue-300 border p-1 mr-4 focus:shadow-outline focus:outline-none" %>
-    <!--<input type="text" name="message" class="flex-grow rounded border-blue-299 border p-1 mr-4 focus:shadow-outline focus:outline-none" autofocus placeholder="Say something" /> -->
     <button class="focus:outline-none focus:shadow-outline focus:border-blue-300 rounded px-3 py-1 bg-blue-300">Send</button>
   </form>
 </div>

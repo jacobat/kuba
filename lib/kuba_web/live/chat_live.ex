@@ -1,6 +1,8 @@
 defmodule KubaWeb.ChatLive do
   use KubaWeb, :live_view
 
+  alias KubaEngine.{Message,SystemMessage}
+
   @impl true
   def mount(_params, session, socket) do
     nick = session["nick"]
@@ -17,6 +19,14 @@ defmodule KubaWeb.ChatLive do
     Kuba.Channels.leave("Lobby", nick)
     IO.puts("view #{id} unmounted")
     :ok
+  end
+
+  def format_message(%Message{author: author, datetime: datetime, body: body}) do
+    "#{Calendar.strftime(datetime, "%H:%M")} #{author}: #{body}"
+  end
+
+  def format_message(%SystemMessage{datetime: datetime, body: body}) do
+    "#{Calendar.strftime(datetime, "%H:%M")}: #{body}"
   end
 
   def handle_event("save", %{"chat" => %{"message" => "/join " <> name}}, socket) do
@@ -49,13 +59,13 @@ defmodule KubaWeb.ChatLive do
 
   def handle_info({:join, nick}, socket) do
     IO.puts "#{inspect self()} received join from #{nick}"
-    new_socket = assign(socket, channel: channel)
+    new_socket = assign(socket, channel: channel, messages: messages)
     {:noreply, new_socket}
   end
 
   def handle_info({:leave, nick}, socket) do
     IO.puts "#{inspect self()} received leave from #{nick}"
-    new_socket = assign(socket, channel: channel)
+    new_socket = assign(socket, channel: channel, messages: messages)
     {:noreply, new_socket}
   end
 

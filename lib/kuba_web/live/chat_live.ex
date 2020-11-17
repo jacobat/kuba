@@ -7,14 +7,27 @@ defmodule KubaWeb.ChatLive do
 
     IO.inspect session
     if connected?(socket) do
+      KubaWeb.ChatLiveMonitor.monitor(ChatLiveMonitor, self(), __MODULE__, %{id: socket.id, nick: nick})
       Kuba.Channels.join("Lobby", nick)
-      {:ok, assign(socket, nick: nick, channel: channel, chat: changeset, messages: messages)}
-    else
-      {:ok, assign(socket, channel: channel, chat: changeset, messages: messages)}
     end
+    {:ok, assign(socket, nick: nick, channel: channel, chat: changeset, messages: messages)}
   end
 
-  @impl true
+  def unmount(%{id: id, nick: nick}, _reason) do
+    Kuba.Channels.leave("Lobby", nick)
+    IO.puts("view #{id} unmounted")
+    :ok
+  end
+
+  def handle_event("save", %{"chat" => %{"message" => "/join " <> name}}, socket) do
+    Kuba.Channels.join(name, socket.assigns.nick)
+    {
+      :noreply,
+      assign(socket, :chat, changeset())
+      |> assign(:messages, messages)
+    }
+  end
+
   def handle_event("save", %{"chat" => %{"message" => message}}, socket) do
     Kuba.Channels.speak("Lobby", socket.assigns.nick, message)
     {
@@ -36,6 +49,12 @@ defmodule KubaWeb.ChatLive do
 
   def handle_info({:join, nick}, socket) do
     IO.puts "#{inspect self()} received join from #{nick}"
+    new_socket = assign(socket, channel: channel)
+    {:noreply, new_socket}
+  end
+
+  def handle_info({:leave, nick}, socket) do
+    IO.puts "#{inspect self()} received leave from #{nick}"
     new_socket = assign(socket, channel: channel)
     {:noreply, new_socket}
   end

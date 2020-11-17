@@ -17,7 +17,8 @@ defmodule Kuba.Application do
       KubaWeb.Endpoint,
       # Start a worker by calling: Kuba.Worker.start_link(arg)
       # {Kuba.Worker, arg}
-      {Chat, []}
+      {Chat, []},
+      {KubaWeb.ChatLiveMonitor, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

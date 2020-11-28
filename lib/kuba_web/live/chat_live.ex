@@ -12,7 +12,16 @@ defmodule KubaWeb.ChatLive do
       KubaWeb.ChatLiveMonitor.monitor(ChatLiveMonitor, self(), __MODULE__, %{id: socket.id, nick: nick})
       Kuba.Channels.join("Lobby", nick)
     end
-    {:ok, assign(socket, nick: nick, channel: channel, chat: changeset, messages: messages)}
+    {
+      :ok,
+      assign(socket,
+        nick: nick,
+        channel: channel,
+        channels: channels,
+        chat: changeset,
+        messages: messages
+      )
+    }
   end
 
   def unmount(%{id: id, nick: nick}, _reason) do
@@ -71,6 +80,10 @@ defmodule KubaWeb.ChatLive do
 
   defp channel do
     KubaEngine.Channel.channel_for("Lobby")
+  end
+
+  defp channels do
+    Kuba.Channels.list
   end
 
   defp messages do

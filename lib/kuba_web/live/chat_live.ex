@@ -12,15 +12,14 @@ defmodule KubaWeb.ChatLive do
       KubaWeb.ChatLiveMonitor.monitor(ChatLiveMonitor, self(), __MODULE__, %{id: socket.id, nick: nick})
       Kuba.Channels.join("Lobby", nick)
     end
+    new_socket = socket
+                 |> assign(nick: nick,
+                   channel: channel("Lobby"),
+                   channels: channels,
+                   chat: changeset)
     {
       :ok,
-      assign(socket,
-        nick: nick,
-        channel: channel,
-        channels: channels,
-        chat: changeset,
-        messages: messages
-      )
+      assign(new_socket, messages: messages(new_socket))
     }
   end
 
@@ -40,19 +39,20 @@ defmodule KubaWeb.ChatLive do
 
   def handle_event("save", %{"chat" => %{"message" => "/join " <> name}}, socket) do
     Kuba.Channels.join(name, socket.assigns.nick)
+    new_socket = assign(socket, :chat, changeset())
+    |> assign(:channel, channel(name))
     {
       :noreply,
-      assign(socket, :chat, changeset())
-      |> assign(:messages, messages)
+      assign(new_socket, :messages, messages(new_socket))
     }
   end
 
   def handle_event("save", %{"chat" => %{"message" => message}}, socket) do
-    Kuba.Channels.speak("Lobby", socket.assigns.nick, message)
+    Kuba.Channels.speak(current_channel_name(socket), socket.assigns.nick, message)
     {
       :noreply,
       assign(socket, :chat, changeset())
-      |> assign(:messages, messages)
+      |> assign(:messages, messages(socket))
     }
   end
 
@@ -62,32 +62,42 @@ defmodule KubaWeb.ChatLive do
 
   def handle_info({:speak, message}, socket) do
     IO.puts "#{inspect self()} received #{message}"
-    new_socket = assign(socket, messages: messages)
+    new_socket = assign(socket, messages: messages(socket))
     {:noreply, new_socket}
   end
 
   def handle_info({:join, nick}, socket) do
     IO.puts "#{inspect self()} received join from #{nick}"
-    new_socket = assign(socket, channel: channel, messages: messages)
+    new_socket = assign(socket, channel: current_channel(socket), messages: messages(socket))
     {:noreply, new_socket}
   end
 
   def handle_info({:leave, nick}, socket) do
     IO.puts "#{inspect self()} received leave from #{nick}"
-    new_socket = assign(socket, channel: channel, messages: messages)
+    new_socket = assign(socket, channel: current_channel(socket), messages: messages(socket))
     {:noreply, new_socket}
   end
 
-  defp channel do
-    KubaEngine.Channel.channel_for("Lobby")
+  defp current_channel(socket) do
+    socket.assigns.channel
+  end
+
+  defp current_channel_name(socket) do
+    current_channel(socket).name
+  end
+
+
+  defp channel(name) do
+    KubaEngine.Channel.channel_for(name)
   end
 
   defp channels do
     Kuba.Channels.list
   end
 
-  defp messages do
-    KubaEngine.Channel.messages_for("Lobby") |> Enum.take(20)
+  defp messages(socket) do
+    IO.puts "Getting messages on #{current_channel_name(socket)}"
+    KubaEngine.Channel.messages_for(current_channel_name(socket)) |> Enum.take(20)
   end
 
   defp changeset() do

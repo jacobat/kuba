@@ -24,7 +24,7 @@ defmodule KubaWeb.ChatLive do
   end
 
   def unmount(%{id: id, user: user}, _reason) do
-    Kuba.Channels.leave("Lobby", user)
+    Kuba.Channels.logoff(user)
     IO.puts("view #{id} unmounted")
     :ok
   end

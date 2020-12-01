@@ -1,19 +1,19 @@
 defmodule KubaWeb.ChatLive do
   use KubaWeb, :live_view
 
-  alias KubaEngine.{Message,SystemMessage}
+  alias KubaEngine.{Message,SystemMessage,User}
 
   @impl true
   def mount(_params, session, socket) do
-    nick = session["nick"]
+    user = User.new(session["nick"])
 
     IO.inspect session
     if connected?(socket) do
-      KubaWeb.ChatLiveMonitor.monitor(ChatLiveMonitor, self(), __MODULE__, %{id: socket.id, nick: nick})
-      Kuba.Channels.join("Lobby", nick)
+      KubaWeb.ChatLiveMonitor.monitor(ChatLiveMonitor, self(), __MODULE__, %{id: socket.id, user: user})
+      Kuba.Channels.join("Lobby", user)
     end
     new_socket = socket
-                 |> assign(nick: nick,
+                 |> assign(user: user,
                    channel: channel("Lobby"),
                    channels: channels,
                    chat: changeset)
@@ -23,14 +23,14 @@ defmodule KubaWeb.ChatLive do
     }
   end
 
-  def unmount(%{id: id, nick: nick}, _reason) do
-    Kuba.Channels.leave("Lobby", nick)
+  def unmount(%{id: id, user: user}, _reason) do
+    Kuba.Channels.leave("Lobby", user)
     IO.puts("view #{id} unmounted")
     :ok
   end
 
   def format_message(%Message{author: author, datetime: datetime, body: body}) do
-    "#{Calendar.strftime(datetime, "%H:%M")} #{author}: #{body}"
+    "#{Calendar.strftime(datetime, "%H:%M")} #{author.nick}: #{body}"
   end
 
   def format_message(%SystemMessage{datetime: datetime, body: body}) do
@@ -38,7 +38,7 @@ defmodule KubaWeb.ChatLive do
   end
 
   def handle_event("save", %{"chat" => %{"message" => "/join " <> name}}, socket) do
-    Kuba.Channels.join(name, socket.assigns.nick)
+    Kuba.Channels.join(name, socket.assigns.user)
     new_socket = assign(socket, :chat, changeset())
     |> assign(:channel, channel(name))
     {
@@ -48,7 +48,7 @@ defmodule KubaWeb.ChatLive do
   end
 
   def handle_event("save", %{"chat" => %{"message" => message}}, socket) do
-    Kuba.Channels.speak(current_channel_name(socket), socket.assigns.nick, message)
+    Kuba.Channels.speak(current_channel_name(socket), socket.assigns.user, message)
     {
       :noreply,
       assign(socket, :chat, changeset())
@@ -66,14 +66,14 @@ defmodule KubaWeb.ChatLive do
     {:noreply, new_socket}
   end
 
-  def handle_info({:join, nick}, socket) do
-    IO.puts "#{inspect self()} received join from #{nick}"
+  def handle_info({:join, user}, socket) do
+    IO.puts "#{inspect self()} received join from #{user.nick}"
     new_socket = assign(socket, channel: current_channel(socket), messages: messages(socket))
     {:noreply, new_socket}
   end
 
-  def handle_info({:leave, nick}, socket) do
-    IO.puts "#{inspect self()} received leave from #{nick}"
+  def handle_info({:leave, user}, socket) do
+    IO.puts "#{inspect self()} received leave from #{user.nick}"
     new_socket = assign(socket, channel: current_channel(socket), messages: messages(socket))
     {:noreply, new_socket}
   end

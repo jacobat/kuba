@@ -1,4 +1,6 @@
 defmodule Kuba.Channels do
+  alias KubaEngine.User
+
   def start_channel(name) do
     if KubaEngine.Channel.exist?(name) do
       IO.puts "Channel #{name} exists"
@@ -8,18 +10,18 @@ defmodule Kuba.Channels do
     end
   end
 
-  def join(name, nick) do
-    IO.puts "#{nick} joining #{name}"
+  def join(name, user = %User{}) do
+    IO.puts "#{user.nick} joining #{name}"
     start_channel(name)
-    KubaEngine.Channel.join(name, nick)
+    KubaEngine.Channel.join(name, user)
     Phoenix.PubSub.subscribe(Kuba.PubSub, "channel:#{name}")
-    Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:join, nick})
+    Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:join, user})
   end
 
-  def leave(name, nick) do
-    IO.puts "#{nick} left #{name}"
-    KubaEngine.Channel.leave(name, nick)
-    Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:leave, nick})
+  def leave(name, user = %User{}) do
+    IO.puts "#{user.nick} left #{name}"
+    KubaEngine.Channel.leave(name, user)
+    Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:leave, user})
     Phoenix.PubSub.unsubscribe(Kuba.PubSub, "channel:#{name}")
   end
 

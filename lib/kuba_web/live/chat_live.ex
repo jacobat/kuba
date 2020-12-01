@@ -41,6 +41,7 @@ defmodule KubaWeb.ChatLive do
     Kuba.Channels.join(name, socket.assigns.user)
     new_socket = assign(socket, :chat, changeset())
     |> assign(:channel, channel(name))
+    |> assign(channels: channels)
     {
       :noreply,
       assign(new_socket, :messages, messages(new_socket))
@@ -68,7 +69,10 @@ defmodule KubaWeb.ChatLive do
 
   def handle_info({:join, user}, socket) do
     IO.puts "#{inspect self()} received join from #{user.nick}"
-    new_socket = assign(socket, channel: current_channel(socket), messages: messages(socket))
+    new_socket = socket
+                 |> assign(channel: current_channel(socket))
+                 |> assign(messages: messages(socket))
+                 |> assign(channels: channels)
     {:noreply, new_socket}
   end
 

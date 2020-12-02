@@ -33,7 +33,7 @@ defmodule Kuba.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:kuba_engine, path: "../kuba_engine" },
+      kuba_engine_dep(Mix.env()),
       {:phoenix, "~> 1.5.6"},
       {:phoenix_ecto, "~> 4.1"},
       {:ecto_sql, "~> 3.4"},
@@ -50,6 +50,9 @@ defmodule Kuba.MixProject do
       {:plug_cowboy, "~> 2.0"}
     ]
   end
+
+  defp kuba_engine_dep(:dev), do: {:kuba_engine, path: "../kuba_engine" }
+  defp kuba_engine_dep(_), do: {:kuba_engine, github: "jacobat/kuba_engine" }
 
   # Aliases are shortcuts or tasks specific to the current project.
   # For example, to install project dependencies and perform other setup tasks, run:

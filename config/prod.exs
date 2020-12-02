@@ -53,3 +53,15 @@ config :logger, level: :info
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
 import_config "prod.secret.exs"
+
+config :kuba, KubaWeb.Endpoint,
+  http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
+  url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
+  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+  server: true 
+
+config :kuba, Kuba.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  url: System.get_env("DATABASE_URL"),
+  ssl: true,
+  pool_size: 2

@@ -4,17 +4,17 @@
 # remember to add this file to your .gitignore.
 use Mix.Config
 
-# database_url =
-#   System.get_env("DATABASE_URL") ||
-#     raise """
-#     environment variable DATABASE_URL is missing.
-#     For example: ecto://USER:PASS@HOST/DATABASE
-#     """
+database_url =
+  System.get_env("DATABASE_URL") ||
+    raise """
+    environment variable DATABASE_URL is missing.
+    For example: ecto://USER:PASS@HOST/DATABASE
+    """
 
-# config :kuba, Kuba.Repo,
-#   # ssl: true,
-#   url: database_url,
-#   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+config :kuba, Kuba.Repo,
+  # ssl: true,
+  url: database_url,
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
 secret_key_base =
   System.get_env("SECRET_KEY_BASE") ||
@@ -29,12 +29,6 @@ config :kuba, KubaWeb.Endpoint,
     transport_options: [socket_opts: [:inet6]]
   ],
   secret_key_base: secret_key_base
-
-config :kuba, KubaWeb.Endpoint,
-  http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
-  url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
-  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
-  server: true 
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

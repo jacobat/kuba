@@ -46,6 +46,7 @@ defmodule KubaWeb.UserLive.Index do
     {:noreply, assign(socket, :users, list_users())}
   end
 
+  @impl true
   def handle_info(state, socket) do
     messages = Chat.messages
     IO.puts "HANDLE BROADCAST FOR [#{state}]: #{IO.inspect(messages)}"

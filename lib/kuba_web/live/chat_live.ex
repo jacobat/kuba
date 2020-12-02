@@ -15,8 +15,8 @@ defmodule KubaWeb.ChatLive do
     new_socket = socket
                  |> assign(user: user,
                    channel: channel("Lobby"),
-                   channels: channels,
-                   chat: changeset)
+                   channels: channels(),
+                   chat: changeset())
     {
       :ok,
       assign(new_socket, messages: messages(new_socket))
@@ -37,9 +37,13 @@ defmodule KubaWeb.ChatLive do
     "#{Calendar.strftime(datetime, "%H:%M")}: #{body}"
   end
 
+  @impl true
   def handle_event("save", %{"chat" => %{"message" => "/join " <> name}}, socket), do: join(name, socket)
+
+  @impl true
   def handle_event("join", %{"name" => name}, socket), do: join(name, socket)
 
+  @impl true
   def handle_event("save", %{"chat" => %{"message" => message}}, socket) do
     Kuba.Channels.speak(current_channel_name(socket), socket.assigns.user, message)
     {
@@ -49,16 +53,19 @@ defmodule KubaWeb.ChatLive do
     }
   end
 
+  @impl true
   def handle_event("change", %{"chat" => %{"message" => message}}, socket) do
     {:noreply, assign(socket, :chat, changeset(message))}
   end
 
+  @impl true
   def handle_info({:speak, message}, socket) do
     IO.puts "#{inspect self()} received #{message}"
     new_socket = assign(socket, messages: messages(socket))
     {:noreply, new_socket}
   end
 
+  @impl true
   def handle_info({:join, user}, socket) do
     IO.puts "#{inspect self()} received join from #{user.nick}"
     new_socket = socket

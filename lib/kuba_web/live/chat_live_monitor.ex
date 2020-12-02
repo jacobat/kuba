@@ -5,7 +5,6 @@ defmodule KubaWeb.ChatLiveMonitor do
     GenServer.call(monitor_pid, {:monitor, live_view_pid, view_module, meta})
   end
 
-  @impl true
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: ChatLiveMonitor)
   end

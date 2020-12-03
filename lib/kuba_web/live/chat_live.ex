@@ -29,12 +29,29 @@ defmodule KubaWeb.ChatLive do
     :ok
   end
 
-  def format_message(%Message{author: author, datetime: datetime, body: body}) do
-    "#{Calendar.strftime(datetime, "%H:%M")} #{author.nick}: #{body}"
+  def format_message(user = %User{}, %Message{author: author, datetime: datetime, body: body}) do
+    if user == author do
+      content_tag(:span,
+        [
+          Calendar.strftime(datetime, "%H:%M"),
+          content_tag(:span, " #{author.nick}:",  class: "text-blue-600"), " ",
+          body
+        ],
+        class: "font-mono")
+    else
+      content_tag(:span,
+        [
+          Calendar.strftime(datetime, "%H:%M"),
+          " #{author.nick}: #{body}"
+        ],
+        class: "font-mono")
+    end
   end
 
-  def format_message(%SystemMessage{datetime: datetime, body: body}) do
-    "#{Calendar.strftime(datetime, "%H:%M")}: #{body}"
+  def format_message(_user, %SystemMessage{datetime: datetime, body: body}) do
+    [
+      content_tag(:span, "#{Calendar.strftime(datetime, "%H:%M")} #{body}", class: "font-mono"),
+    ]
   end
 
   @impl true

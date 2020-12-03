@@ -35,8 +35,8 @@ defmodule Kuba.Channels do
     list() |> Enum.map(fn channel -> leave(channel.name, user) end)
   end
 
-  def speak(name, nick, message) do
-    KubaEngine.Channel.speak(name, KubaEngine.Message.new(message, nick))
+  def speak(name, user, message) do
+    KubaEngine.Channel.speak(name, KubaEngine.Message.new(message, user))
     Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:speak, message})
   end
 end

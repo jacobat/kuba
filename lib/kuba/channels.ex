@@ -13,9 +13,11 @@ defmodule Kuba.Channels do
   def join(name, user = %User{}) do
     IO.puts "#{user.nick} joining #{name}"
     start_channel(name)
-    KubaEngine.Channel.join(name, user)
-    Phoenix.PubSub.subscribe(Kuba.PubSub, "channel:#{name}")
-    Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:join, user})
+    unless KubaEngine.Channel.member?(name, user) do
+      KubaEngine.Channel.join(name, user)
+      Phoenix.PubSub.subscribe(Kuba.PubSub, "channel:#{name}")
+      Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:join, user})
+    end
   end
 
   def leave(name, user = %User{}) do

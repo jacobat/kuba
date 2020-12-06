@@ -33,7 +33,7 @@ defmodule KubaWeb.ChatLive do
     if user == author do
       content_tag(:span,
         [
-          Calendar.strftime(datetime, "%H:%M"),
+          format_time(datetime),
           content_tag(:span, " #{author.nick}:",  class: "text-blue-600"), " ",
           body
         ],
@@ -41,7 +41,7 @@ defmodule KubaWeb.ChatLive do
     else
       content_tag(:span,
         [
-          Calendar.strftime(datetime, "%H:%M"),
+          format_time(datetime),
           " #{author.nick}: #{body}"
         ],
         class: "font-mono")
@@ -50,8 +50,14 @@ defmodule KubaWeb.ChatLive do
 
   def format_message(_user, %SystemMessage{datetime: datetime, body: body}) do
     [
-      content_tag(:span, "#{Calendar.strftime(datetime, "%H:%M")} #{body}", class: "font-mono"),
+      content_tag(:span, "#{format_time(datetime)} #{body}", class: "font-mono"),
     ]
+  end
+
+  def format_time(datetime) do
+    { :ok, cph_time } = datetime
+                        |> DateTime.shift_zone("Europe/Copenhagen")
+    Calendar.strftime(cph_time, "%H:%M")
   end
 
   @impl true

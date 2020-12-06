@@ -49,15 +49,13 @@ defmodule KubaWeb.ChatLive do
   end
 
   def format_message(_user, %SystemMessage{datetime: datetime, body: body}) do
-    [
-      content_tag(:span, "#{format_time(datetime)} #{body}", class: "font-mono"),
-    ]
+    [ content_tag(:span, "#{format_time(datetime)} #{body}", class: "font-mono") ]
   end
 
   def format_time(datetime) do
-    { :ok, cph_time } = datetime
-                        |> DateTime.shift_zone("Europe/Copenhagen")
-    Calendar.strftime(cph_time, "%H:%M")
+    datetime
+    |> DateTime.shift_zone!("Europe/Copenhagen")
+    |> Calendar.strftime("%H:%M")
   end
 
   @impl true
@@ -152,4 +150,3 @@ defmodule KubaWeb.ChatLive do
     Ecto.Changeset.cast({data, types}, %{ message: message}, [:message])
   end
 end
-

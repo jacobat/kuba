@@ -29,12 +29,11 @@ defmodule Kuba.Channels do
 
   def list do
     KubaEngine.ChannelSupervisor.names
-    |> Enum.map(&KubaEngine.Channel.channel_for/1)
   end
 
 
   def logoff(user = %User{}) do
-    list() |> Enum.map(fn channel -> leave(channel.name, user) end)
+    list() |> Enum.map(fn channel -> leave(channel, user) end)
   end
 
   def speak(name, user, message) do

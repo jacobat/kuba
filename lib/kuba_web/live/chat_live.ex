@@ -112,11 +112,12 @@ defmodule KubaWeb.ChatLive do
   end
 
   defp current_channel(socket) do
-    socket.assigns.channel
+    current_channel_name(socket)
+    |> channel()
   end
 
   defp current_channel_name(socket) do
-    current_channel(socket).name
+    socket.assigns.channel.name
   end
 
 

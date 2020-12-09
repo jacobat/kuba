@@ -1,4 +1,5 @@
 defmodule KubaWeb.ChatLive do
+  require Logger
   use KubaWeb, :live_view
 
   alias KubaEngine.{Message,SystemMessage,User}
@@ -7,7 +8,7 @@ defmodule KubaWeb.ChatLive do
   def mount(_params, session, socket) do
     user = User.new(session["nick"])
 
-    IO.inspect session
+    Logger.debug(inspect session)
     if connected?(socket) do
       KubaWeb.ChatLiveMonitor.monitor(ChatLiveMonitor, self(), __MODULE__, %{id: socket.id, user: user})
       Kuba.Channels.join("Lobby", user)
@@ -25,7 +26,7 @@ defmodule KubaWeb.ChatLive do
 
   def unmount(%{id: id, user: user}, _reason) do
     Kuba.Channels.logoff(user)
-    IO.puts("view #{id} unmounted")
+    Logger.debug("view #{id} unmounted")
     :ok
   end
 
@@ -81,14 +82,14 @@ defmodule KubaWeb.ChatLive do
 
   @impl true
   def handle_info({:speak, message}, socket) do
-    IO.puts "#{inspect self()} received #{message}"
+    Logger.debug "#{inspect self()} received #{message}"
     new_socket = assign(socket, messages: messages(socket))
     {:noreply, new_socket}
   end
 
   @impl true
   def handle_info({:join, user}, socket) do
-    IO.puts "#{inspect self()} received join from #{user.nick}"
+    Logger.debug "#{inspect self()} received join from #{user.nick}"
     new_socket = socket
                  |> assign(channel: current_channel(socket))
                  |> assign(messages: messages(socket))
@@ -97,7 +98,7 @@ defmodule KubaWeb.ChatLive do
   end
 
   def handle_info({:leave, user}, socket) do
-    IO.puts "#{inspect self()} received leave from #{user.nick}"
+    Logger.debug "#{inspect self()} received leave from #{user.nick}"
     new_socket = assign(socket, channel: current_channel(socket), messages: messages(socket))
     {:noreply, new_socket}
   end
@@ -134,7 +135,7 @@ defmodule KubaWeb.ChatLive do
   end
 
   defp messages(socket) do
-    IO.puts "Getting messages on #{current_channel_name(socket)}"
+    Logger.debug "Getting messages on #{current_channel_name(socket)}"
     KubaEngine.Channel.messages_for(current_channel_name(socket)) |> Enum.take(20)
   end
 

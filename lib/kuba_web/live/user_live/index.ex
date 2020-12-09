@@ -1,4 +1,5 @@
 defmodule KubaWeb.UserLive.Index do
+  require Logger
   use KubaWeb, :live_view
 
   alias Kuba.Accounts
@@ -7,7 +8,7 @@ defmodule KubaWeb.UserLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     Phoenix.PubSub.subscribe(Kuba.PubSub, "test")
-    IO.puts "Mounting socket for index live"
+    Logger.debug "Mounting socket for index live"
     socket = assign(socket, :messages, Chat.messages)
     {:ok, assign(socket, :users, list_users())}
   end
@@ -49,7 +50,7 @@ defmodule KubaWeb.UserLive.Index do
   @impl true
   def handle_info(state, socket) do
     messages = Chat.messages
-    IO.puts "HANDLE BROADCAST FOR [#{state}]: #{IO.inspect(messages)}"
+    Logger.debug "HANDLE BROADCAST FOR [#{state}]: #{inspect(messages)}"
     {:noreply, assign(socket, :messages, messages)}
   end
 

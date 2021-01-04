@@ -8,7 +8,12 @@ defmodule Kuba.Channels do
     else
       Logger.debug "Kuba.Channels.start_channel Channel #{name} starting"
       KubaEngine.ChannelSupervisor.start_channel(name)
+      Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channels", {:new_channel, name})
     end
+  end
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(Kuba.PubSub, "channels")
   end
 
   def join(name, user = %User{}) do

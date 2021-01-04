@@ -21,9 +21,6 @@ defmodule Kuba.Application do
       {KubaWeb.ChatLiveMonitor, []}
     ]
 
-    Kuba.Channels.start_channel("Lobby")
-    Kuba.Channels.start_channel("Games")
-
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Kuba.Supervisor]

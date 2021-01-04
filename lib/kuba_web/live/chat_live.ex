@@ -11,6 +11,7 @@ defmodule KubaWeb.ChatLive do
     Logger.debug(inspect session)
     if connected?(socket) do
       KubaWeb.ChatLiveMonitor.monitor(ChatLiveMonitor, self(), __MODULE__, %{id: socket.id, user: user})
+      Kuba.Channels.subscribe()
       Kuba.Channels.join("Lobby", user)
     end
     new_socket = socket
@@ -81,6 +82,13 @@ defmodule KubaWeb.ChatLive do
   @impl true
   def handle_event("change", %{"chat" => %{"message" => message}}, socket) do
     {:noreply, assign(socket, :chat, changeset(message))}
+  end
+
+  @impl true
+  def handle_info({:new_channel, name}, socket) do
+    new_socket = socket
+                 |> assign(channels: channels())
+    {:noreply, new_socket}
   end
 
   @impl true

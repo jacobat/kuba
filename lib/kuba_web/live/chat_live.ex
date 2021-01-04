@@ -66,6 +66,9 @@ defmodule KubaWeb.ChatLive do
   def handle_event("join", %{"name" => name}, socket), do: join(name, socket)
 
   @impl true
+  def handle_event("join-new", _, socket), do: {:noreply, assign(socket, :chat, changeset("/join "))}
+
+  @impl true
   def handle_event("save", %{"chat" => %{"message" => message}}, socket) do
     Kuba.Channels.speak(current_channel_name(socket), socket.assigns.user, message)
     {

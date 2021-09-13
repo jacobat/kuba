@@ -52,8 +52,8 @@ defmodule Kuba.MixProject do
     ]
   end
 
-  defp kuba_engine_dep(:dev), do: {:kuba_engine, path: "../kuba_engine" }
-  defp kuba_engine_dep(_), do: {:kuba_engine, github: "jacobat/kuba_engine" }
+  defp kuba_engine_dep(:dev), do: {:kuba_engine, path: "../kuba_engine"}
+  defp kuba_engine_dep(_), do: {:kuba_engine, github: "jacobat/kuba_engine"}
 
   # Aliases are shortcuts or tasks specific to the current project.
   # For example, to install project dependencies and perform other setup tasks, run:

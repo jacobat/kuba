@@ -1,3 +1,3 @@
 defmodule KubaWeb.SignInView do
-    use KubaWeb, :view
+  use KubaWeb, :view
 end

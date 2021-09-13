@@ -8,8 +8,8 @@ defmodule KubaWeb.UserLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     Phoenix.PubSub.subscribe(Kuba.PubSub, "test")
-    Logger.debug "Mounting socket for index live"
-    socket = assign(socket, :messages, Chat.messages)
+    Logger.debug("Mounting socket for index live")
+    socket = assign(socket, :messages, Chat.messages())
     {:ok, assign(socket, :users, list_users())}
   end
 
@@ -19,15 +19,18 @@ defmodule KubaWeb.UserLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    result = socket
-    |> assign(:page_title, "Edit User")
-    |> assign(:user, Accounts.get_user!(id))
+    result =
+      socket
+      |> assign(:page_title, "Edit User")
+      |> assign(:user, Accounts.get_user!(id))
+
     Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "edit:#{id}")
     result
   end
 
   defp apply_action(socket, :new, _params) do
     Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "new")
+
     socket
     |> assign(:page_title, "New User")
     |> assign(:user, %User{})
@@ -49,8 +52,8 @@ defmodule KubaWeb.UserLive.Index do
 
   @impl true
   def handle_info(state, socket) do
-    messages = Chat.messages
-    Logger.debug "HANDLE BROADCAST FOR [#{state}]: #{inspect(messages)}"
+    messages = Chat.messages()
+    Logger.debug("HANDLE BROADCAST FOR [#{state}]: #{inspect(messages)}")
     {:noreply, assign(socket, :messages, messages)}
   end
 

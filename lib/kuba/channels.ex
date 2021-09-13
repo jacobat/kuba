@@ -4,9 +4,9 @@ defmodule Kuba.Channels do
 
   def start_channel(name) do
     if KubaEngine.Channel.exist?(name) do
-      Logger.debug "Channel #{name} exists"
+      Logger.debug("Channel #{name} exists")
     else
-      Logger.debug "Kuba.Channels.start_channel Channel #{name} starting"
+      Logger.debug("Kuba.Channels.start_channel Channel #{name} starting")
       KubaEngine.ChannelSupervisor.start_channel(name)
       Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channels", {:new_channel, name})
     end
@@ -17,8 +17,9 @@ defmodule Kuba.Channels do
   end
 
   def join(name, user = %User{}) do
-    Logger.debug "#{user.nick} joining #{name}"
+    Logger.debug("#{user.nick} joining #{name}")
     start_channel(name)
+
     unless KubaEngine.Channel.member?(name, user) do
       KubaEngine.Channel.join(name, user)
       Phoenix.PubSub.subscribe(Kuba.PubSub, "channel:#{name}")
@@ -27,16 +28,15 @@ defmodule Kuba.Channels do
   end
 
   def leave(name, user = %User{}) do
-    Logger.debug "#{user.nick} left #{name}"
+    Logger.debug("#{user.nick} left #{name}")
     KubaEngine.Channel.leave(name, user)
     Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:leave, user})
     Phoenix.PubSub.unsubscribe(Kuba.PubSub, "channel:#{name}")
   end
 
   def list do
-    KubaEngine.ChannelSupervisor.names
+    KubaEngine.ChannelSupervisor.names()
   end
-
 
   def logoff(user = %User{}) do
     list() |> Enum.map(fn channel -> leave(channel, user) end)

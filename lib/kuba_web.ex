@@ -46,7 +46,7 @@ defmodule KubaWeb do
     quote do
       use Phoenix.LiveView,
         layout: {KubaWeb.LayoutView, "live.html"},
-        container: { :div, class: "h-screen flex flex-col" }
+        container: {:div, class: "h-screen flex flex-col"}
 
       unquote(view_helpers())
     end

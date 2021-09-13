@@ -23,7 +23,8 @@ defmodule KubaWeb.ChatLiveMonitor do
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, reason}, state) do
     {{module, meta}, new_views} = Map.pop(state.views, pid)
-    module.unmount(meta, reason) # should wrap in isolated task or rescue from exception
+    # should wrap in isolated task or rescue from exception
+    module.unmount(meta, reason)
     {:noreply, %{state | views: new_views}}
   end
 end

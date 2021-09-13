@@ -13,13 +13,13 @@ defmodule Chat do
   #   Agent.get(__MODULE__, &Map.get(&1, key))
   # end
   def messages do
-    Agent.get(__MODULE__, &(&1))
+    Agent.get(__MODULE__, & &1)
   end
 
   @doc "Puts a value"
   # @spec put(String.t, {String.t, any}) :: Map.t
   def put(message) do
-    Agent.update(__MODULE__, fn list -> [ message | list ] end)
+    Agent.update(__MODULE__, fn list -> [message | list] end)
     # more sophisticated implementation,
     # possibly based on `Agent.get_and_update/3`
   end

@@ -32,6 +32,7 @@ defmodule KubaWeb.UserLive.FormComponent do
       {:ok, user} ->
         Chat.put("Updated user #{user.name}")
         Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "edit:#{user.id}")
+
         {:noreply,
          socket
          |> put_flash(:info, "User updated successfully")
@@ -47,6 +48,7 @@ defmodule KubaWeb.UserLive.FormComponent do
       {:ok, user} ->
         Chat.put("Created user #{user.name}")
         Phoenix.PubSub.broadcast(Kuba.PubSub, "test", "edit:#{user.id}")
+
         {:noreply,
          socket
          |> put_flash(:info, "User created successfully")

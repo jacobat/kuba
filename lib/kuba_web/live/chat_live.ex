@@ -162,7 +162,7 @@ defmodule KubaWeb.ChatLive do
   end
 
   defp channel(name) do
-    KubaEngine.Channel.channel_for(name)
+    KubaEngine.ChannelServer.channel_for(name)
   end
 
   defp channels do
@@ -170,8 +170,8 @@ defmodule KubaWeb.ChatLive do
   end
 
   defp messages(socket) do
-    Logger.debug("#{inspect(self())} Getting messages on #{current_channel_name(socket)}")
-    KubaEngine.Channel.messages_for(current_channel_name(socket)) |> Enum.take(20)
+    Logger.debug "#{inspect self()} Getting messages on #{current_channel_name(socket)}"
+    KubaEngine.ChannelServer.messages_for(current_channel_name(socket)) |> Enum.take(20)
   end
 
   defp changeset() do

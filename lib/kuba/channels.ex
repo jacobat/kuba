@@ -4,7 +4,7 @@ defmodule Kuba.Channels do
 
   def start_channel(name) do
     if KubaEngine.ChannelServer.exist?(name) do
-      Logger.debug "Channel #{name} exists"
+      Logger.debug("Channel #{name} exists")
     else
       Logger.debug("Kuba.Channels.start_channel Channel #{name} starting")
       KubaEngine.ChannelSupervisor.start_channel(name)
@@ -19,6 +19,7 @@ defmodule Kuba.Channels do
   def join(name, user = %User{}) do
     Logger.debug("#{user.nick} joining #{name}")
     start_channel(name)
+
     unless KubaEngine.ChannelServer.member?(name, user) do
       KubaEngine.ChannelServer.join(name, user)
       Phoenix.PubSub.subscribe(Kuba.PubSub, "channel:#{name}")
@@ -27,7 +28,7 @@ defmodule Kuba.Channels do
   end
 
   def leave(name, user = %User{}) do
-    Logger.debug "#{user.nick} left #{name}"
+    Logger.debug("#{user.nick} left #{name}")
     KubaEngine.ChannelServer.leave(name, user)
     Phoenix.PubSub.broadcast_from(Kuba.PubSub, self(), "channel:#{name}", {:leave, user})
     Phoenix.PubSub.unsubscribe(Kuba.PubSub, "channel:#{name}")
